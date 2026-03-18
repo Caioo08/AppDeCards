@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SpacedRepetitionApp.Views.CreateCardPage"
+             Title="CreateCardPage">
+    <VerticalStackLayout>
+        <VerticalStackLayout Padding="20">
+
+            <Entry x:Name="PerguntaEntry" Placeholder="Pergunta" />
+            <Entry x:Name="RespostaEntry" Placeholder="Resposta" />
+
+            <Button Text="Salvar" Clicked="OnSaveClicked"/>
+
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentPage>

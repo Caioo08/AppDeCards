@@ -1,0 +1,32 @@
+<ContentPage 
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="SpacedRepetitionApp.Views.StudyPage">
+
+    <VerticalStackLayout Padding="20" Spacing="20">
+
+        <Label 
+            Text="{Binding PerguntaAtual}" 
+            FontSize="22"
+            HorizontalOptions="Center" />
+
+        <Label 
+            Text="{Binding RespostaAtual}" 
+            FontSize="18"
+            IsVisible="{Binding MostrarResposta}" />
+
+        <Button 
+            Text="Ver Resposta"
+            Command="{Binding MostrarRespostaCommand}" />
+
+        <HorizontalStackLayout Spacing="10" IsVisible="{Binding MostrarResposta}">
+
+            <Button Text="Errei" Command="{Binding ResponderCommand}" CommandParameter="0"/>
+            <Button Text="Difícil" Command="{Binding ResponderCommand}" CommandParameter="3"/>
+            <Button Text="Médio" Command="{Binding ResponderCommand}" CommandParameter="4"/>
+            <Button Text="Fácil" Command="{Binding ResponderCommand}" CommandParameter="5"/>
+
+        </HorizontalStackLayout>
+
+    </VerticalStackLayout>
+</ContentPage>
