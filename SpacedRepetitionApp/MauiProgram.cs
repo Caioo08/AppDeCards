@@ -2,41 +2,44 @@ using Microsoft.Extensions.Logging;
 using SpacedRepetitionApp.Services;
 using SpacedRepetitionApp.Views;
 
-namespace SpacedRepetitionApp
+namespace SpacedRepetitionApp;
+
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp.CreateBuilder();
-            builder
-                .UseMauiApp<App>()
-                .ConfigureFonts(fonts =>
-                {
-                    fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
-                    fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                });
+        var builder = MauiApp.CreateBuilder();
+        builder
+            .UseMauiApp<App>()
+            .ConfigureFonts(fonts =>
+            {
+                fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
+                fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
+            });
 
-            builder.Services.AddSingleton<DatabaseService>();
-            builder.Services.AddSingleton<CardService>();
-            builder.Services.AddSingleton<HomeViewModel>();
-            builder.Services.AddSingleton<MainPage>();
-            builder.Services.AddSingleton<ReviewService>();
+        // ── Serviços (Singleton — stateless ou conexão única) ──────────
+        builder.Services.AddSingleton<DatabaseService>();
+        builder.Services.AddSingleton<CardService>();
+        builder.Services.AddSingleton<ReviewService>();
+        builder.Services.AddSingleton<StatsService>();
 
-            // FIX: StudyViewModel e StudyPage eram Singleton — o ViewModel nunca reiniciava
-            // os cards entre sessões. Transient garante nova instância a cada navegação.
-            builder.Services.AddTransient<StudyViewModel>();
-            builder.Services.AddTransient<StudyPage>();
+        // ── ViewModels ─────────────────────────────────────────────────
+        builder.Services.AddSingleton<HomeViewModel>();
+        builder.Services.AddSingleton<StatsViewModel>();
+        builder.Services.AddTransient<StudyViewModel>();   // reinicia a cada sessão
+        builder.Services.AddTransient<EditCardViewModel>(); // nova instância por edição
 
-            // FIX: CreateCardPage não estava registrada no DI — era instanciada
-            // manualmente via MauiContext dentro da View (má prática).
-            builder.Services.AddTransient<CreateCardPage>();
+        // ── Pages ──────────────────────────────────────────────────────
+        builder.Services.AddSingleton<MainPage>();
+        builder.Services.AddSingleton<StatsPage>();
+        builder.Services.AddTransient<StudyPage>();
+        builder.Services.AddTransient<CreateCardPage>();
+        builder.Services.AddTransient<EditCardPage>();
 
 #if DEBUG
-            builder.Logging.AddDebug();
+        builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
-        }
+        return builder.Build();
     }
 }

@@ -1,9 +1,8 @@
-﻿using SQLite;
-using System.IO;
+using SQLite;
 
 public class DatabaseService
 {
-    private SQLiteConnection _db;
+    private readonly SQLiteConnection _db;
 
     public DatabaseService()
     {
@@ -12,10 +11,11 @@ public class DatabaseService
 
         _db.CreateTable<Card>();
         _db.CreateTable<Deck>();
+        _db.CreateTable<StudySession>();
+
+        _db.CreateIndex("idx_card_proxima", "Card", "ProximaRevisao");
+        _db.CreateIndex("idx_session_data", "StudySession", "Data");
     }
 
-    public SQLiteConnection GetConnection()
-    {
-        return _db;
-    }
+    public SQLiteConnection GetConnection() => _db;
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="SpacedRepetitionApp.Views.CreateCardPage"
-             Title="Novo Card">
+             x:Class="SpacedRepetitionApp.Views.EditCardPage"
+             Title="Editar Card">
 
     <ContentPage.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
@@ -14,9 +14,9 @@
     <ScrollView>
         <VerticalStackLayout Padding="24,28,24,40" Spacing="0">
 
-            <Label Text="Novo Card" FontSize="30" FontAttributes="Bold"
+            <Label Text="Editar Card" FontSize="30" FontAttributes="Bold"
                    TextColor="#E2E8F0" Margin="0,0,0,4"/>
-            <Label Text="Pergunta + resposta para memorizar"
+            <Label Text="Altere a pergunta ou a resposta"
                    FontSize="13" TextColor="#4A5568" Margin="0,0,0,32"/>
 
             <Label Text="PERGUNTA" FontSize="10" FontAttributes="Bold"
@@ -25,7 +25,6 @@
                     Stroke="#1A2233" StrokeThickness="1"
                     Padding="18,4" Margin="0,0,0,24">
                 <Entry x:Name="PerguntaEntry"
-                       Placeholder="O que você quer memorizar?"
                        PlaceholderColor="#2D3748" TextColor="#E2E8F0"
                        BackgroundColor="Transparent" FontSize="15" HeightRequest="52"/>
             </Border>
@@ -36,17 +35,24 @@
                     Stroke="#1A2233" StrokeThickness="1"
                     Padding="18,4" Margin="0,0,0,36">
                 <Entry x:Name="RespostaEntry"
-                       Placeholder="A resposta correta é..."
                        PlaceholderColor="#2D3748" TextColor="#E2E8F0"
                        BackgroundColor="Transparent" FontSize="15" HeightRequest="52"/>
             </Border>
 
             <Border BackgroundColor="#00E5A0" StrokeShape="RoundRectangle 16"
-                    StrokeThickness="0" Padding="0">
-                <Button Text="Salvar Card" Clicked="OnSaveClicked"
+                    StrokeThickness="0" Margin="0,0,0,12" Padding="0">
+                <Button Text="Salvar Alterações" Clicked="OnSaveClicked"
                         BackgroundColor="Transparent" TextColor="#0A0A0F"
                         FontAttributes="Bold" FontSize="16"
                         HeightRequest="56" BorderWidth="0"/>
+            </Border>
+
+            <Border BackgroundColor="#0F1623" StrokeShape="RoundRectangle 16"
+                    Stroke="#1A2233" StrokeThickness="1" Padding="0">
+                <Button Text="Cancelar" Clicked="OnCancelarClicked"
+                        BackgroundColor="Transparent" TextColor="#9996A8"
+                        FontAttributes="Bold" FontSize="15"
+                        HeightRequest="50" BorderWidth="0"/>
             </Border>
 
         </VerticalStackLayout>

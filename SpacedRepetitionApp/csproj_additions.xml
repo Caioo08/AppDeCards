@@ -1,0 +1,18 @@
+<!--
+  Adicione estes itens ao <ItemGroup> que já contém
+  os outros MauiXaml no seu .csproj
+-->
+<ItemGroup>
+  <MauiXaml Update="Views\CreateCardPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Views\StudyPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Views\EditCardPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+  <MauiXaml Update="Views\StatsPage.xaml">
+    <Generator>MSBuild:Compile</Generator>
+  </MauiXaml>
+</ItemGroup>

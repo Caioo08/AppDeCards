@@ -9,28 +9,25 @@ public class CardService
         _db = database.GetConnection();
     }
 
-    public void Add(Card card)
-    {
-        _db.Insert(card);
-    }
+    public void Add(Card card)       => _db.Insert(card);
+    public void Update(Card card)    => _db.Update(card);
+    public void Delete(Card card)    => _db.Delete(card);
+    public Card? GetById(int id)     => _db.Find<Card>(id);
 
-    public List<Card> GetAll()
-    {
-        return _db.Table<Card>().ToList();
-    }
+    public List<Card> GetAll()       => _db.Table<Card>().ToList();
 
+    /// <summary>Cards com ProximaRevisao vencida (modo revisão normal).</summary>
     public List<Card> GetTodayCards()
     {
-        // FIX: sqlite-net-pcl não suporta DateTime.Now diretamente no LINQ —
-        // causa NotSupportedException em runtime. Usar variável local.
         var agora = DateTime.Now;
         return _db.Table<Card>()
                   .Where(c => c.ProximaRevisao <= agora)
                   .ToList();
     }
 
-    public void Update(Card card)
+    public int GetTodayCount()
     {
-        _db.Update(card);
+        var agora = DateTime.Now;
+        return _db.Table<Card>().Where(c => c.ProximaRevisao <= agora).Count();
     }
 }
