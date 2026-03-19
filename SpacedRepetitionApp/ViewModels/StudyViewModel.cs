@@ -1,4 +1,3 @@
-﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows.Input;
 using SpacedRepetitionApp.Services;
@@ -24,6 +23,20 @@ public class StudyViewModel : INotifyPropertyChanged
         {
             _mostrarResposta = value;
             OnPropertyChanged(nameof(MostrarResposta));
+            OnPropertyChanged(nameof(NaoMostrarResposta));
+        }
+    }
+
+    public bool NaoMostrarResposta => !_mostrarResposta;
+
+    private bool _sessaoConcluida;
+    public bool SessaoConcluida
+    {
+        get => _sessaoConcluida;
+        set
+        {
+            _sessaoConcluida = value;
+            OnPropertyChanged(nameof(SessaoConcluida));
         }
     }
 
@@ -40,22 +53,30 @@ public class StudyViewModel : INotifyPropertyChanged
             _cards = _cardService.GetAll();
 
         MostrarRespostaCommand = new Command(() => MostrarResposta = true);
-        ResponderCommand = new Command<int>(Responder);
+
+        // FIX: Command<string> porque o XAML sempre passa CommandParameter como string.
+        // Command<int> faz o comando ignorar o clique silenciosamente quando recebe string.
+        ResponderCommand = new Command<string>(qualidadeStr =>
+        {
+            if (int.TryParse(qualidadeStr, out int qualidade))
+                Responder(qualidade);
+        });
     }
 
     private void Responder(int qualidade)
     {
         var card = _cards[_currentIndex];
-
         var atualizado = _reviewService.Revisar(card, qualidade);
-
         _cardService.Update(atualizado);
 
         MostrarResposta = false;
         _currentIndex++;
 
         if (_currentIndex >= _cards.Count)
-            _currentIndex = 0;
+        {
+            SessaoConcluida = true;
+            return;
+        }
 
         AtualizarTela();
     }
@@ -65,6 +86,7 @@ public class StudyViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(PerguntaAtual));
         OnPropertyChanged(nameof(RespostaAtual));
         OnPropertyChanged(nameof(MostrarResposta));
+        OnPropertyChanged(nameof(NaoMostrarResposta));
     }
 
     protected void OnPropertyChanged(string name)

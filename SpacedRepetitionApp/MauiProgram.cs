@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using SpacedRepetitionApp.Services;
 using SpacedRepetitionApp.Views;
 
@@ -21,9 +21,16 @@ namespace SpacedRepetitionApp
             builder.Services.AddSingleton<CardService>();
             builder.Services.AddSingleton<HomeViewModel>();
             builder.Services.AddSingleton<MainPage>();
-            builder.Services.AddSingleton<StudyViewModel>();
-            builder.Services.AddSingleton<StudyPage>();
             builder.Services.AddSingleton<ReviewService>();
+
+            // FIX: StudyViewModel e StudyPage eram Singleton — o ViewModel nunca reiniciava
+            // os cards entre sessões. Transient garante nova instância a cada navegação.
+            builder.Services.AddTransient<StudyViewModel>();
+            builder.Services.AddTransient<StudyPage>();
+
+            // FIX: CreateCardPage não estava registrada no DI — era instanciada
+            // manualmente via MauiContext dentro da View (má prática).
+            builder.Services.AddTransient<CreateCardPage>();
 
 #if DEBUG
             builder.Logging.AddDebug();

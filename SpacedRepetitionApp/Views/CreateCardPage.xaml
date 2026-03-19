@@ -2,15 +2,96 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SpacedRepetitionApp.Views.CreateCardPage"
-             Title="CreateCardPage">
-    <VerticalStackLayout>
-        <VerticalStackLayout Padding="20">
+             Title="Novo Card">
 
-            <Entry x:Name="PerguntaEntry" Placeholder="Pergunta" />
-            <Entry x:Name="RespostaEntry" Placeholder="Resposta" />
+    <NavigationPage.BarBackgroundColor>
+        <Color>#0A0A0F</Color>
+    </NavigationPage.BarBackgroundColor>
 
-            <Button Text="Salvar" Clicked="OnSaveClicked"/>
+    <ContentPage.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Color="#0A0A0F" Offset="0.0"/>
+            <GradientStop Color="#0D1117" Offset="1.0"/>
+        </LinearGradientBrush>
+    </ContentPage.Background>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,28,24,40" Spacing="0">
+
+            <!-- ── TÍTULO ─────────────────────────────── -->
+            <Label Text="Novo Card"
+                   FontSize="30"
+                   FontAttributes="Bold"
+                   TextColor="#E2E8F0"
+                   CharacterSpacing="-0.5"
+                   Margin="0,0,0,4"/>
+            <Label Text="Pergunta + resposta para memorizar"
+                   FontSize="13"
+                   TextColor="#4A5568"
+                   Margin="0,0,0,36"/>
+
+            <!-- ── CAMPO PERGUNTA ─────────────────────── -->
+            <Label Text="PERGUNTA"
+                   FontSize="10"
+                   FontAttributes="Bold"
+                   TextColor="#2D3748"
+                   CharacterSpacing="2"
+                   Margin="0,0,0,10"/>
+
+            <Border BackgroundColor="#0F1623"
+                    StrokeShape="RoundRectangle 16"
+                    Stroke="#1A2233"
+                    StrokeThickness="1"
+                    Padding="18,4"
+                    Margin="0,0,0,28">
+                <Entry x:Name="PerguntaEntry"
+                       Placeholder="O que você quer memorizar?"
+                       PlaceholderColor="#2D3748"
+                       TextColor="#E2E8F0"
+                       BackgroundColor="Transparent"
+                       FontSize="15"
+                       HeightRequest="52"/>
+            </Border>
+
+            <!-- ── CAMPO RESPOSTA ─────────────────────── -->
+            <Label Text="RESPOSTA"
+                   FontSize="10"
+                   FontAttributes="Bold"
+                   TextColor="#2D3748"
+                   CharacterSpacing="2"
+                   Margin="0,0,0,10"/>
+
+            <Border BackgroundColor="#0F1623"
+                    StrokeShape="RoundRectangle 16"
+                    Stroke="#1A2233"
+                    StrokeThickness="1"
+                    Padding="18,4"
+                    Margin="0,0,0,40">
+                <Entry x:Name="RespostaEntry"
+                       Placeholder="A resposta correta é..."
+                       PlaceholderColor="#2D3748"
+                       TextColor="#E2E8F0"
+                       BackgroundColor="Transparent"
+                       FontSize="15"
+                       HeightRequest="52"/>
+            </Border>
+
+            <!-- ── BOTÃO SALVAR ───────────────────────── -->
+            <Border BackgroundColor="#00E5A0"
+                    StrokeShape="RoundRectangle 16"
+                    StrokeThickness="0"
+                    Padding="0">
+                <Button Text="Salvar Card"
+                        Clicked="OnSaveClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="#0A0A0F"
+                        FontAttributes="Bold"
+                        FontSize="16"
+                        HeightRequest="56"
+                        BorderWidth="0"/>
+            </Border>
 
         </VerticalStackLayout>
-    </VerticalStackLayout>
+    </ScrollView>
+
 </ContentPage>

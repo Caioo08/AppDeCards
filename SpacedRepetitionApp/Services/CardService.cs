@@ -1,6 +1,4 @@
-﻿using SQLite;
-using System.Collections.Generic;
-using System.Linq;
+using SQLite;
 
 public class CardService
 {
@@ -23,8 +21,11 @@ public class CardService
 
     public List<Card> GetTodayCards()
     {
+        // FIX: sqlite-net-pcl não suporta DateTime.Now diretamente no LINQ —
+        // causa NotSupportedException em runtime. Usar variável local.
+        var agora = DateTime.Now;
         return _db.Table<Card>()
-                  .Where(c => c.ProximaRevisao <= DateTime.Now)
+                  .Where(c => c.ProximaRevisao <= agora)
                   .ToList();
     }
 
