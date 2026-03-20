@@ -16,4 +16,7 @@ public partial class StatsPage : ContentPage
         base.OnAppearing();
         _vm.Carregar();
     }
+
+    private async void OnVoltarClicked(object sender, EventArgs e)
+        => await Navigation.PopAsync();
 }

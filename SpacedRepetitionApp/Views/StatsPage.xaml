@@ -2,104 +2,183 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SpacedRepetitionApp.Views.StatsPage"
-             Title="Estatísticas">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#1C1917">
 
-    <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#0A0A0F" Offset="0.0"/>
-            <GradientStop Color="#0D1117" Offset="1.0"/>
-        </LinearGradientBrush>
-    </ContentPage.Background>
+    <Grid RowDefinitions="Auto,*">
 
-    <ScrollView>
-        <VerticalStackLayout Padding="24,24,24,40" Spacing="0">
+        <!-- HEADER COM BOTÃO VOLTAR -->
+        <Grid Grid.Row="0"
+              Padding="20,52,20,16"
+              ColumnDefinitions="Auto,*">
 
-            <Label Text="Estatísticas" FontSize="30" FontAttributes="Bold"
-                   TextColor="#E2E8F0" Margin="0,0,0,28"/>
+            <Border Grid.Column="0"
+                    BackgroundColor="#292524"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="#44403C" StrokeThickness="1"
+                    Padding="0" VerticalOptions="Center">
+                <Button Text="←"
+                        Clicked="OnVoltarClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="#A8A29E"
+                        FontSize="18"
+                        WidthRequest="44" HeightRequest="40"
+                        BorderWidth="0"/>
+            </Border>
 
-            <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,10,Auto" Margin="0,0,0,28">
+            <Label Grid.Column="1"
+                   Text="Estatísticas"
+                   FontSize="18" FontAttributes="Bold"
+                   TextColor="#F5F5F4"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"/>
 
-                <Border Grid.Row="0" Grid.Column="0" BackgroundColor="#0F1623"
-                        StrokeShape="RoundRectangle 16" Stroke="#1A2233"
-                        StrokeThickness="1" Padding="18,16">
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="{Binding TotalCards}" FontSize="32"
-                               FontAttributes="Bold" TextColor="#E2E8F0"/>
-                        <Label Text="cards criados" FontSize="12" TextColor="#4A5568"/>
-                    </VerticalStackLayout>
+        </Grid>
+
+        <!-- CONTEÚDO -->
+        <ScrollView Grid.Row="1">
+            <VerticalStackLayout Padding="24,8,24,48" Spacing="0">
+
+                <!-- Grid 2×2 de stats -->
+                <Grid ColumnDefinitions="*,8,*"
+                      RowDefinitions="Auto,8,Auto"
+                      Margin="0,0,0,16">
+
+                    <Border Grid.Row="0" Grid.Column="0"
+                            BackgroundColor="#292524"
+                            StrokeShape="RoundRectangle 18"
+                            Stroke="#44403C" StrokeThickness="1"
+                            Padding="18,16">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="{Binding TotalCards}"
+                                   FontSize="30" FontAttributes="Bold"
+                                   TextColor="#F5F5F4"/>
+                            <Label Text="cards criados"
+                                   FontSize="11" TextColor="#78716C"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="0" Grid.Column="2"
+                            BackgroundColor="#1A1208"
+                            StrokeShape="RoundRectangle 18"
+                            Stroke="#78350F" StrokeThickness="1"
+                            Padding="18,16">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="{Binding CardsHoje}"
+                                   FontSize="30" FontAttributes="Bold"
+                                   TextColor="#F59E0B"/>
+                            <Label Text="para revisar"
+                                   FontSize="11" TextColor="#78716C"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="2" Grid.Column="0"
+                            BackgroundColor="#1F1208"
+                            StrokeShape="RoundRectangle 18"
+                            Stroke="#3B2008" StrokeThickness="1"
+                            Padding="18,16">
+                        <VerticalStackLayout Spacing="3">
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="🔥" FontSize="24"
+                                       VerticalOptions="Center"/>
+                                <Label Text="{Binding Streak}"
+                                       FontSize="30" FontAttributes="Bold"
+                                       TextColor="#FB923C"
+                                       VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                            <Label Text="{Binding StreakTexto}"
+                                   FontSize="11" TextColor="#78716C"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Row="2" Grid.Column="2"
+                            BackgroundColor="#081F10"
+                            StrokeShape="RoundRectangle 18"
+                            Stroke="#0E3B1A" StrokeThickness="1"
+                            Padding="18,16">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="{Binding TaxaAcertoTexto}"
+                                   FontSize="30" FontAttributes="Bold"
+                                   TextColor="#86EFAC"/>
+                            <Label Text="taxa de acerto"
+                                   FontSize="11" TextColor="#78716C"/>
+                        </VerticalStackLayout>
+                    </Border>
+
+                </Grid>
+
+                <!-- Cards maduros -->
+                <Border BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 18"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="18,14" Margin="0,0,0,24">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2"
+                                             VerticalOptions="Center">
+                            <Label Text="CARDS MADUROS"
+                                   FontSize="9" FontAttributes="Bold"
+                                   TextColor="#57534E" CharacterSpacing="2.5"/>
+                            <Label Text="Revisados 5+ vezes com sucesso"
+                                   FontSize="12" TextColor="#78716C"/>
+                        </VerticalStackLayout>
+                        <Label Grid.Column="1"
+                               Text="{Binding CardsMaturos}"
+                               FontSize="30" FontAttributes="Bold"
+                               TextColor="#86EFAC"
+                               VerticalOptions="Center"/>
+                    </Grid>
                 </Border>
 
-                <Border Grid.Row="0" Grid.Column="2" BackgroundColor="#0F1623"
-                        StrokeShape="RoundRectangle 16" Stroke="#00E5A030"
-                        StrokeThickness="1" Padding="18,16">
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="{Binding CardsHoje}" FontSize="32"
-                               FontAttributes="Bold" TextColor="#00E5A0"/>
-                        <Label Text="para hoje" FontSize="12" TextColor="#4A5568"/>
-                    </VerticalStackLayout>
-                </Border>
+                <!-- Separador -->
+                <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,14">
+                    <Label Grid.Column="0"
+                           Text="ÚLTIMAS SESSÕES"
+                           FontSize="9" FontAttributes="Bold"
+                           TextColor="#57534E" CharacterSpacing="2.5"
+                           VerticalOptions="Center"/>
+                    <BoxView Grid.Column="1"
+                             HeightRequest="1"
+                             BackgroundColor="#292524"
+                             Margin="10,0,0,0"
+                             VerticalOptions="Center"/>
+                </Grid>
 
-                <Border Grid.Row="2" Grid.Column="0" BackgroundColor="#1A0D00"
-                        StrokeShape="RoundRectangle 16" Stroke="#3D2500"
-                        StrokeThickness="1" Padding="18,16">
-                    <VerticalStackLayout Spacing="4">
-                        <HorizontalStackLayout Spacing="6">
-                            <Label Text="🔥" FontSize="26" VerticalOptions="Center"/>
-                            <Label Text="{Binding Streak}" FontSize="32"
-                                   FontAttributes="Bold" TextColor="#FF6B35"
-                                   VerticalOptions="Center"/>
-                        </HorizontalStackLayout>
-                        <Label Text="{Binding StreakTexto}" FontSize="12" TextColor="#4A5568"/>
-                    </VerticalStackLayout>
-                </Border>
+                <!-- Histórico -->
+                <CollectionView ItemsSource="{Binding UltimasSessoes}"
+                                SelectionMode="None">
+                    <CollectionView.EmptyView>
+                        <Label Text="Nenhuma sessão registrada ainda."
+                               FontSize="13" TextColor="#57534E"
+                               Margin="0,8,0,0"/>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border Margin="0,0,0,8"
+                                    BackgroundColor="#292524"
+                                    StrokeShape="RoundRectangle 14"
+                                    Stroke="#3C3836" StrokeThickness="1"
+                                    Padding="18,14">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="4">
+                                        <Label Text="{Binding Data, StringFormat='{}{0:dd/MM/yyyy}'}"
+                                               FontSize="14" FontAttributes="Bold"
+                                               TextColor="#E7E5E4"/>
+                                        <Label Text="{Binding CardsRevisados, StringFormat='{0} cards revisados'}"
+                                               FontSize="12" TextColor="#78716C"/>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Acertos, StringFormat='{0} ✓'}"
+                                           FontSize="18" FontAttributes="Bold"
+                                           TextColor="#86EFAC"
+                                           VerticalOptions="Center"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
 
-                <Border Grid.Row="2" Grid.Column="2" BackgroundColor="#0A1A12"
-                        StrokeShape="RoundRectangle 16" Stroke="#153D25"
-                        StrokeThickness="1" Padding="18,16">
-                    <VerticalStackLayout Spacing="4">
-                        <Label Text="{Binding TaxaAcertoTexto}" FontSize="32"
-                               FontAttributes="Bold" TextColor="#68D391"/>
-                        <Label Text="taxa de acerto" FontSize="12" TextColor="#4A5568"/>
-                    </VerticalStackLayout>
-                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
 
-            </Grid>
-
-            <Grid ColumnDefinitions="Auto,*" Margin="0,0,0,14">
-                <Label Grid.Column="0" Text="ÚLTIMAS SESSÕES" FontSize="11"
-                       FontAttributes="Bold" TextColor="#2D3748"
-                       CharacterSpacing="2" VerticalOptions="Center"/>
-                <BoxView Grid.Column="1" HeightRequest="1" BackgroundColor="#1A2233"
-                         Margin="10,0,0,0" VerticalOptions="Center"/>
-            </Grid>
-
-            <CollectionView ItemsSource="{Binding UltimasSessoes}" SelectionMode="None">
-                <CollectionView.EmptyView>
-                    <Label Text="Nenhuma sessão registrada ainda."
-                           FontSize="14" TextColor="#4A5568" Margin="0,12,0,0"/>
-                </CollectionView.EmptyView>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Border Margin="0,0,0,10" BackgroundColor="#0F1623"
-                                StrokeShape="RoundRectangle 14"
-                                Stroke="#1A2233" StrokeThickness="1" Padding="18,14">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <VerticalStackLayout Grid.Column="0" Spacing="3">
-                                    <Label Text="{Binding Data, StringFormat='{}{0:dd/MM/yyyy}'}"
-                                           FontSize="14" FontAttributes="Bold" TextColor="#E2E8F0"/>
-                                    <Label Text="{Binding CardsRevisados, StringFormat='{0} cards revisados'}"
-                                           FontSize="12" TextColor="#4A5568"/>
-                                </VerticalStackLayout>
-                                <Label Grid.Column="1"
-                                       Text="{Binding Acertos, StringFormat='{0} ✓'}"
-                                       FontSize="18" FontAttributes="Bold"
-                                       TextColor="#68D391" VerticalOptions="Center"/>
-                            </Grid>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-
-        </VerticalStackLayout>
-    </ScrollView>
+    </Grid>
 </ContentPage>

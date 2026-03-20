@@ -1,76 +1,86 @@
 namespace SpacedRepetitionApp.Services;
 
-/// <summary>
-/// Implementação completa do SM-2.
-/// Cada botão de resposta tem um label de intervalo calculado
-/// previamente para mostrar ao usuário ("em 1 dia", "em 4 dias", etc).
-/// </summary>
 public class ReviewService
 {
-    // ── Revisão principal ──────────────────────────────────────────────
+    // ── Ponto 4: único método privado compartilhado por Revisar e CalcularPreview ──
+
+    /// <summary>
+    /// Calcula o próximo intervalo baseado no estado atual do card e na qualidade.
+    /// Usado tanto para aplicar a revisão quanto para simular o preview dos botões.
+    /// </summary>
+    private static (int intervalo, double facilidade) CalcularProximoEstado(
+        int repeticoesAtuais, int intervaloAtual, double facilidadeAtual, int qualidade)
+    {
+        double novaFacilidade = facilidadeAtual;
+        int novoIntervalo;
+
+        if (qualidade < 3)
+        {
+            novoIntervalo = 1;
+            // Facilidade não muda em falha (SM-2 puro)
+        }
+        else
+        {
+            novoIntervalo = repeticoesAtuais switch
+            {
+                0 => 1,
+                1 => 6,
+                _ => (int)Math.Round(intervaloAtual * facilidadeAtual)
+            };
+            novaFacilidade += 0.1 - (5 - qualidade) * (0.08 + (5 - qualidade) * 0.02);
+        }
+
+        novaFacilidade = Math.Max(1.3, novaFacilidade);
+        return (novoIntervalo, novaFacilidade);
+    }
+
+    // ── Ponto 1: DateTime.Now.Date para consistência sem fuso horário ─────────
 
     public Card Revisar(Card card, int qualidade)
     {
         card.TotalRevisoes++;
 
+        var (intervalo, facilidade) = CalcularProximoEstado(
+            card.Repeticoes, card.Intervalo, card.Facilidade, qualidade);
+
         if (qualidade < 3)
         {
-            // Falha: reinicia sequência
             card.Repeticoes = 0;
-            card.Intervalo = 1;
         }
         else
         {
             card.TotalAcertos++;
-            card.Intervalo = card.Repeticoes switch
-            {
-                0 => 1,
-                1 => 6,
-                _ => (int)Math.Round(card.Intervalo * card.Facilidade)
-            };
             card.Repeticoes++;
-            card.Facilidade += 0.1 - (5 - qualidade) * (0.08 + (5 - qualidade) * 0.02);
         }
 
-        card.Facilidade = Math.Max(1.3, card.Facilidade);
-        card.ProximaRevisao = DateTime.Now.AddDays(card.Intervalo);
+        card.Intervalo        = intervalo;
+        card.Facilidade       = facilidade;
+        card.ProximaRevisao   = DateTime.Now.Date.AddDays(intervalo); // Ponto 1: Date normaliza hora para meia-noite
         return card;
     }
 
-    // ── Preview dos próximos intervalos (para mostrar nos botões) ──────
+    // ── Preview usa exatamente a mesma função interna ─────────────────────────
 
-    /// <summary>
-    /// Retorna o texto de intervalo que cada botão causaria,
-    /// sem modificar o card original.
-    /// Ex: "1 dia", "6 dias", "12 dias"
-    /// </summary>
     public IntervalPreview CalcularPreview(Card card)
     {
         return new IntervalPreview
         {
-            Errei   = FormatarIntervalo(SimularIntervalo(card, 0)),
-            Dificil = FormatarIntervalo(SimularIntervalo(card, 3)),
-            Medio   = FormatarIntervalo(SimularIntervalo(card, 4)),
-            Facil   = FormatarIntervalo(SimularIntervalo(card, 5)),
+            Errei   = Formatar(CalcularProximoEstado(card.Repeticoes, card.Intervalo, card.Facilidade, 0).intervalo),
+            Dificil = Formatar(CalcularProximoEstado(card.Repeticoes, card.Intervalo, card.Facilidade, 3).intervalo),
+            Medio   = Formatar(CalcularProximoEstado(card.Repeticoes, card.Intervalo, card.Facilidade, 4).intervalo),
+            Facil   = Formatar(CalcularProximoEstado(card.Repeticoes, card.Intervalo, card.Facilidade, 5).intervalo),
         };
     }
 
-    private int SimularIntervalo(Card card, int qualidade)
+    public static string Formatar(int dias) => dias switch
     {
-        if (qualidade < 3) return 1;
-
-        return card.Repeticoes switch
-        {
-            0 => 1,
-            1 => 6,
-            _ => (int)Math.Round(card.Intervalo * Math.Max(1.3, card.Facilidade + 0.1 - (5 - qualidade) * (0.08 + (5 - qualidade) * 0.02)))
-        };
-    }
-
-    private string FormatarIntervalo(int dias) => dias switch
-    {
-        1 => "1 dia",
-        _ => $"{dias} dias"
+        1     => "1 dia",
+        < 7   => $"{dias} dias",
+        7     => "1 semana",
+        < 30  => $"{dias / 7} sem.",
+        30    => "1 mês",
+        < 365 => $"{dias / 30} meses",
+        _     => $"{dias / 365} ano(s)"
     };
 }
 

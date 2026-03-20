@@ -3,22 +3,38 @@ namespace SpacedRepetitionApp.Views;
 public partial class StudyPage : ContentPage
 {
     private readonly StudyViewModel _vm;
+    private bool _modoDefinido = false;
+
+    // Evento disparado quando a sessão conclui — MainPage assina para atualizar contadores
+    public event Action? SessaoConcluida;
 
     public StudyPage(StudyViewModel vm)
     {
         InitializeComponent();
         BindingContext = vm;
         _vm = vm;
+
+        // Monitora quando o ViewModel sinaliza fim de sessão
+        _vm.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(StudyViewModel.SessaoConcluida)
+                && _vm.SessaoConcluida)
+            {
+                SessaoConcluida?.Invoke();
+            }
+        };
     }
 
-    /// <summary>Chamado pela MainPage antes de PushAsync para definir o modo.</summary>
-    public void DefinirModo(StudyMode modo) => _vm.IniciarSessao(modo);
+    public void DefinirModo(StudyMode modo)
+    {
+        _modoDefinido = true;
+        _vm.IniciarSessao(modo);
+    }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        // Só inicia se ainda não foi iniciado (DefinirModo chama IniciarSessao)
-        if (!_vm.EmAndamento && !_vm.SessaoConcluida)
+        if (!_modoDefinido)
             _vm.IniciarSessao(StudyMode.Today);
     }
 

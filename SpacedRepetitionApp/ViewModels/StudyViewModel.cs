@@ -2,37 +2,34 @@ using System.ComponentModel;
 using System.Windows.Input;
 using SpacedRepetitionApp.Services;
 
-/// <summary>
-/// Modo de estudo controlado por StudyMode:
-///   Today  = apenas cards com revisão vencida (padrão)
-///   All    = todos os cards (opção "Estudar Tudo")
-/// </summary>
 public enum StudyMode { Today, All }
 
 public class StudyViewModel : INotifyPropertyChanged
 {
-    private readonly CardService   _cardService;
-    private readonly ReviewService _reviewService;
-    private readonly StatsService  _statsService;
+    private readonly StudySessionService _sessao;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    private List<Card> _cards = new();
-    private int        _currentIndex = 0;
-    private int        _acertos      = 0;
-    private StudyMode  _modo         = StudyMode.Today;
+    // Ponto 7: guard contra múltiplos cliques
+    private bool _isBusy = false;
 
-    // ── Propriedades da pergunta/resposta ─────────────────────────────
+    // ── Propriedades delegadas ao StudySessionService ─────────────────
 
-    public string PerguntaAtual => _cards.Count > 0 ? _cards[_currentIndex].Pergunta : string.Empty;
-    public string RespostaAtual => _cards.Count > 0 ? _cards[_currentIndex].Resposta : string.Empty;
+    public string PerguntaAtual  => _sessao.CardAtual?.Pergunta  ?? string.Empty;
+    public string RespostaAtual  => _sessao.CardAtual?.Resposta  ?? string.Empty;
+    public string Progresso      => _sessao.Progresso;
+    public double ProgressoValor => _sessao.ProgressoValor;
+    public bool   EmAndamento    => _sessao.EmAndamento;
+    public bool   SemCards       => _sessao.SemCards;
+    public bool   SessaoConcluida => _sessao.Concluida;
+    public string TaxaAcertoTexto => _sessao.TaxaAcertoTexto;
+    public int    TotalSessao    => _sessao.TotalCards;
+    public int    AcertosSessao  => _sessao.Acertos;
+    public string ModoTexto      => _modo == StudyMode.All ? "Estudando todos" : "Revisão do dia";
 
-    public string Progresso      => _cards.Count > 0 ? $"{_currentIndex + 1} de {_cards.Count}" : string.Empty;
-    public double ProgressoValor => _cards.Count > 0 ? (double)_currentIndex / _cards.Count : 0;
+    private StudyMode _modo = StudyMode.Today;
 
-    public string ModoTexto => _modo == StudyMode.All ? "Estudando todos" : "Revisão do dia";
-
-    // ── Preview de intervalos (mostrado nos botões) ───────────────────
+    // ── Preview ───────────────────────────────────────────────────────
 
     private IntervalPreview _preview = new();
 
@@ -41,7 +38,7 @@ public class StudyViewModel : INotifyPropertyChanged
     public string PreviewMedio   => $"◑  Médio\n{_preview.Medio}";
     public string PreviewFacil   => $"✓  Fácil\n{_preview.Facil}";
 
-    // ── Estado da UI ──────────────────────────────────────────────────
+    // ── Resposta ──────────────────────────────────────────────────────
 
     private bool _mostrarResposta;
     public bool MostrarResposta
@@ -56,28 +53,6 @@ public class StudyViewModel : INotifyPropertyChanged
     }
     public bool NaoMostrarResposta => !_mostrarResposta;
 
-    private bool _sessaoConcluida;
-    public bool SessaoConcluida
-    {
-        get => _sessaoConcluida;
-        set
-        {
-            _sessaoConcluida = value;
-            OnPropertyChanged(nameof(SessaoConcluida));
-            OnPropertyChanged(nameof(EmAndamento));
-        }
-    }
-
-    public bool EmAndamento => !SessaoConcluida && _cards.Count > 0;
-    public bool SemCards    => _cards.Count == 0;
-
-    // Resultado da sessão
-    public int    TotalSessao      => _cards.Count;
-    public int    AcertosSessao    => _acertos;
-    public string TaxaAcertoTexto  => TotalSessao > 0
-        ? $"{Math.Round((double)_acertos / TotalSessao * 100)}%"
-        : "0%";
-
     // ── Commands ──────────────────────────────────────────────────────
 
     public ICommand MostrarRespostaCommand { get; }
@@ -86,63 +61,53 @@ public class StudyViewModel : INotifyPropertyChanged
 
     // ── Construtor ────────────────────────────────────────────────────
 
-    public StudyViewModel(CardService cardService, ReviewService reviewService, StatsService statsService)
+    public StudyViewModel(StudySessionService sessao)
     {
-        _cardService   = cardService;
-        _reviewService = reviewService;
-        _statsService  = statsService;
+        _sessao = sessao;
 
-        MostrarRespostaCommand = new Command(() => MostrarResposta = true);
+        MostrarRespostaCommand = new Command(
+            () => MostrarResposta = true,
+            () => !_isBusy && _sessao.EmAndamento);
 
+        // Ponto 7: IsBusy bloqueia múltiplos cliques rápidos
         ResponderCommand = new Command<string>(qualStr =>
         {
-            if (int.TryParse(qualStr, out int q)) Responder(q);
+            if (_isBusy) return;
+            if (!int.TryParse(qualStr, out int q)) return;
+
+            _isBusy = true;
+            try { Responder(q); }
+            finally { _isBusy = false; }
         });
 
         ReiniciarCommand = new Command(() => IniciarSessao(_modo));
     }
 
-    // ── Iniciar sessão ────────────────────────────────────────────────
+    // ── Sessão ────────────────────────────────────────────────────────
 
     public void IniciarSessao(StudyMode modo = StudyMode.Today)
     {
-        _modo         = modo;
-        _currentIndex = 0;
-        _acertos      = 0;
-        SessaoConcluida = false;
+        _modo           = modo;
         MostrarResposta = false;
-
-        _cards = modo == StudyMode.All
-            ? _cardService.GetAll()
-            : _cardService.GetTodayCards();
-
-        // Se não há cards vencidos, cai em All automaticamente
-        if (_cards.Count == 0 && modo == StudyMode.Today)
-            _cards = _cardService.GetAll();
-
+        _sessao.Iniciar(modo);
         AtualizarPreview();
         AtualizarTela();
     }
 
-    // ── Responder ─────────────────────────────────────────────────────
-
     private void Responder(int qualidade)
     {
-        var card = _cards[_currentIndex];
-        _cardService.Update(_reviewService.Revisar(card, qualidade));
-
-        if (qualidade >= 3) _acertos++;
-
         MostrarResposta = false;
-        _currentIndex++;
 
-        if (_currentIndex >= _cards.Count)
+        // Ponto 10: delegate retorna bool indicando se sessão concluiu
+        var concluida = _sessao.Responder(qualidade);
+
+        if (concluida)
         {
-            _statsService.RegistrarSessao(_cards.Count, _acertos);
-            SessaoConcluida = true;
+            AtualizarTela();
             OnPropertyChanged(nameof(TaxaAcertoTexto));
             OnPropertyChanged(nameof(AcertosSessao));
             OnPropertyChanged(nameof(TotalSessao));
+            OnPropertyChanged(nameof(SessaoConcluida));
             return;
         }
 
@@ -152,8 +117,8 @@ public class StudyViewModel : INotifyPropertyChanged
 
     private void AtualizarPreview()
     {
-        if (_cards.Count == 0 || _currentIndex >= _cards.Count) return;
-        _preview = _reviewService.CalcularPreview(_cards[_currentIndex]);
+        // Ponto 10: null safety — preview pode ser null se não há card atual
+        _preview = _sessao.GetPreviewAtual() ?? new IntervalPreview();
         OnPropertyChanged(nameof(PreviewErrei));
         OnPropertyChanged(nameof(PreviewDificil));
         OnPropertyChanged(nameof(PreviewMedio));
@@ -168,6 +133,7 @@ public class StudyViewModel : INotifyPropertyChanged
         OnPropertyChanged(nameof(ProgressoValor));
         OnPropertyChanged(nameof(EmAndamento));
         OnPropertyChanged(nameof(SemCards));
+        OnPropertyChanged(nameof(SessaoConcluida));
         OnPropertyChanged(nameof(ModoTexto));
     }
 

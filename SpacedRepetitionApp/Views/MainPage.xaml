@@ -2,131 +2,205 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SpacedRepetitionApp.MainPage"
-             NavigationPage.HasNavigationBar="False">
-
-    <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#0A0A0F" Offset="0.0"/>
-            <GradientStop Color="#0D1117" Offset="1.0"/>
-        </LinearGradientBrush>
-    </ContentPage.Background>
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#1C1917">
 
     <ScrollView>
         <VerticalStackLayout Spacing="0">
 
-            <!-- ── HEADER ──────────────────────────────────── -->
-            <Grid Padding="28,56,28,24" ColumnDefinitions="*,Auto">
-                <VerticalStackLayout Grid.Column="0" Spacing="4">
-                    <Label Text="memo." FontSize="32" FontAttributes="Bold"
-                           TextColor="#00E5A0" CharacterSpacing="-1"/>
-                    <Label Text="seus flashcards" FontSize="13" TextColor="#4A5568"/>
+            <!-- ══ HEADER CUSTOMIZADO ══════════════════════════════════ -->
+            <Grid Padding="24,56,24,20" ColumnDefinitions="*,Auto">
+
+                <VerticalStackLayout Grid.Column="0" Spacing="2" VerticalOptions="Center">
+                    <Label Text="memo."
+                           FontSize="32" FontAttributes="Bold"
+                           TextColor="#F59E0B" CharacterSpacing="-0.5"/>
+                    <Label Text="{Binding BannerTexto}"
+                           FontSize="13" TextColor="#78716C"/>
                 </VerticalStackLayout>
-                <Border Grid.Column="1" VerticalOptions="Center"
-                        BackgroundColor="#131920" StrokeShape="RoundRectangle 20"
-                        Stroke="#1E2D3D" StrokeThickness="1" Padding="12,8">
-                    <HorizontalStackLayout Spacing="4">
-                        <Label Text="🔥" FontSize="14" VerticalOptions="Center"/>
-                        <Label Text="{Binding Streak}" FontSize="13" FontAttributes="Bold"
-                               TextColor="#FF6B35" VerticalOptions="Center"/>
+
+                <!-- Badge streak -->
+                <Border Grid.Column="1"
+                        IsVisible="{Binding StreakVisivel}"
+                        VerticalOptions="Center"
+                        BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 24"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="12,8">
+                    <HorizontalStackLayout Spacing="5">
+                        <Label Text="🔥" FontSize="15" VerticalOptions="Center"/>
+                        <Label Text="{Binding Streak}"
+                               FontSize="15" FontAttributes="Bold"
+                               TextColor="#FB923C" VerticalOptions="Center"/>
                     </HorizontalStackLayout>
                 </Border>
+
             </Grid>
 
-            <!-- ── STATS ────────────────────────────────────── -->
-            <Grid Padding="28,0,28,20" ColumnDefinitions="*,10,*">
-                <Border Grid.Column="0" BackgroundColor="#0F1623"
-                        StrokeShape="RoundRectangle 16" Stroke="#1A2233"
-                        StrokeThickness="1" Padding="18,14">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding CardsHoje}" FontSize="32"
-                               FontAttributes="Bold" TextColor="#00E5A0"/>
-                        <Label Text="para revisar hoje" FontSize="12" TextColor="#4A5568"/>
+            <!-- ══ BANNER DE REVISÃO (quando há cards vencidos) ════════ -->
+            <Grid Padding="24,0,24,16" IsVisible="{Binding TemCardsHoje}">
+                <Border BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 20"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="20,18">
+                    <Grid ColumnDefinitions="*,Auto">
+
+                        <VerticalStackLayout Grid.Column="0" Spacing="4" VerticalOptions="Center">
+                            <Label Text="PARA REVISAR HOJE"
+                                   FontSize="9" FontAttributes="Bold"
+                                   TextColor="#F59E0B" CharacterSpacing="2"/>
+                            <Label Text="{Binding CardsHoje, StringFormat='{0} cards aguardando'}"
+                                   FontSize="22" FontAttributes="Bold"
+                                   TextColor="#F5F5F4"/>
+                        </VerticalStackLayout>
+
+                        <Border Grid.Column="1"
+                                BackgroundColor="#F59E0B"
+                                StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                VerticalOptions="Center" Padding="0">
+                            <Button Text="Revisar"
+                                    Clicked="OnStudyTodayClicked"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#1C1917"
+                                    FontAttributes="Bold" FontSize="14"
+                                    WidthRequest="90" HeightRequest="44"
+                                    BorderWidth="0"/>
+                        </Border>
+
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ══ STATS GRID ══════════════════════════════════════════ -->
+            <Grid Padding="24,0,24,16" ColumnDefinitions="*,10,*">
+
+                <Border Grid.Column="0"
+                        BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 18"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="18,16">
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="{Binding Cards.Count}"
+                               FontSize="30" FontAttributes="Bold"
+                               TextColor="#F5F5F4"/>
+                        <Label Text="cards criados"
+                               FontSize="11" TextColor="#78716C"/>
                     </VerticalStackLayout>
                 </Border>
-                <Border Grid.Column="2" BackgroundColor="#0F1623"
-                        StrokeShape="RoundRectangle 16" Stroke="#1A2233"
-                        StrokeThickness="1" Padding="18,14">
-                    <VerticalStackLayout Spacing="2">
-                        <Label Text="{Binding Cards.Count}" FontSize="32"
-                               FontAttributes="Bold" TextColor="#E2E8F0"/>
-                        <Label Text="total de cards" FontSize="12" TextColor="#4A5568"/>
+
+                <Border Grid.Column="2"
+                        BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 18"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="18,16">
+                    <VerticalStackLayout Spacing="3">
+                        <Label Text="{Binding CardsHoje}"
+                               FontSize="30" FontAttributes="Bold"
+                               TextColor="#F59E0B"/>
+                        <Label Text="para revisar"
+                               FontSize="11" TextColor="#78716C"/>
                     </VerticalStackLayout>
                 </Border>
+
             </Grid>
 
-            <!-- ── BOTÕES DE ESTUDO ──────────────────────────── -->
-            <!-- Revisar hoje (só aparece quando tem cards vencidos) -->
-            <Grid Padding="28,0,28,10" IsVisible="{Binding TemCardsHoje}">
-                <Border BackgroundColor="#00E5A0" StrokeShape="RoundRectangle 16"
-                        StrokeThickness="0" Padding="0">
-                    <Button Text="▶  Revisar Hoje" Clicked="OnStudyTodayClicked"
-                            BackgroundColor="Transparent" TextColor="#0A0A0F"
-                            FontAttributes="Bold" FontSize="15"
-                            HeightRequest="54" BorderWidth="0"/>
-                </Border>
-            </Grid>
+            <!-- ══ BOTÕES DE AÇÃO ═══════════════════════════════════════ -->
+            <Grid Padding="24,0,24,10" ColumnDefinitions="*,10,*">
 
-            <!-- Dois botões secundários: Novo Card e Estudar Tudo -->
-            <Grid Padding="28,0,28,10" ColumnDefinitions="*,10,*">
-                <Border Grid.Column="0" BackgroundColor="#0F1623"
-                        StrokeShape="RoundRectangle 16" Stroke="#1A2233"
-                        StrokeThickness="1" Padding="0">
-                    <Button Text="＋  Novo Card" Clicked="OnAddCardClicked"
-                            BackgroundColor="Transparent" TextColor="#00E5A0"
+                <Border Grid.Column="0"
+                        BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="0">
+                    <Button Text="＋  Novo Card"
+                            Clicked="OnAddCardClicked"
+                            BackgroundColor="Transparent"
+                            TextColor="#F59E0B"
                             FontAttributes="Bold" FontSize="14"
                             HeightRequest="50" BorderWidth="0"/>
                 </Border>
-                <Border Grid.Column="2" BackgroundColor="#0F1623"
-                        StrokeShape="RoundRectangle 16" Stroke="#1A2233"
-                        StrokeThickness="1" Padding="0">
-                    <Button Text="∞  Estudar Tudo" Clicked="OnStudyAllClicked"
-                            BackgroundColor="Transparent" TextColor="#9996A8"
+
+                <Border Grid.Column="2"
+                        BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="0">
+                    <Button Text="∞  Estudar Tudo"
+                            Clicked="OnStudyAllClicked"
+                            BackgroundColor="Transparent"
+                            TextColor="#A8A29E"
                             FontAttributes="Bold" FontSize="14"
                             HeightRequest="50" BorderWidth="0"/>
                 </Border>
+
             </Grid>
 
-            <!-- Botão Estatísticas -->
-            <Grid Padding="28,0,28,28">
-                <Border BackgroundColor="#0F1623" StrokeShape="RoundRectangle 16"
-                        Stroke="#1A2233" StrokeThickness="1" Padding="0">
-                    <Button Text="📊  Estatísticas" Clicked="OnStatsClicked"
-                            BackgroundColor="Transparent" TextColor="#4A5568"
+            <Grid Padding="24,0,24,24">
+                <Border BackgroundColor="#292524"
+                        StrokeShape="RoundRectangle 16"
+                        Stroke="#44403C" StrokeThickness="1"
+                        Padding="0">
+                    <Button Text="📊  Estatísticas"
+                            Clicked="OnStatsClicked"
+                            BackgroundColor="Transparent"
+                            TextColor="#78716C"
                             FontAttributes="Bold" FontSize="13"
                             HeightRequest="44" BorderWidth="0"/>
                 </Border>
             </Grid>
 
-            <!-- ── LABEL SEÇÃO ───────────────────────────────── -->
-            <Grid Padding="28,0,28,14" ColumnDefinitions="Auto,*">
-                <Label Grid.Column="0" Text="CARDS" FontSize="11"
-                       FontAttributes="Bold" TextColor="#2D3748"
-                       CharacterSpacing="2" VerticalOptions="Center"/>
-                <BoxView Grid.Column="1" HeightRequest="1" BackgroundColor="#1A2233"
-                         Margin="10,0,0,0" VerticalOptions="Center"/>
+            <!-- ══ SEPARADOR ═══════════════════════════════════════════ -->
+            <Grid Padding="24,0,24,14" ColumnDefinitions="Auto,*,Auto">
+                <Label Grid.Column="0"
+                       Text="MEUS CARDS"
+                       FontSize="10" FontAttributes="Bold"
+                       TextColor="#57534E" CharacterSpacing="2.5"
+                       VerticalOptions="Center"/>
+                <BoxView Grid.Column="1"
+                         HeightRequest="1"
+                         BackgroundColor="#292524"
+                         Margin="10,0" VerticalOptions="Center"/>
+                <Label Grid.Column="2"
+                       Text="← editar   deletar →"
+                       FontSize="10" TextColor="#3C3836"
+                       VerticalOptions="Center"/>
             </Grid>
 
-            <!-- ── LISTA COM SWIPE ───────────────────────────── -->
+            <!-- ══ LISTA COM SWIPE ══════════════════════════════════════ -->
             <CollectionView ItemsSource="{Binding Cards}"
-                            Margin="28,0,28,40" SelectionMode="None">
+                            Margin="24,0,24,48"
+                            SelectionMode="None">
 
                 <CollectionView.EmptyView>
-                    <VerticalStackLayout Spacing="10" Margin="0,40,0,0">
-                        <Label Text="—" FontSize="32" TextColor="#2D3748"
+                    <VerticalStackLayout Spacing="10"
+                                         Margin="0,48,0,0"
+                                         HorizontalOptions="Center">
+                        <Label Text="✦" FontSize="36"
+                               TextColor="#3C3836"
                                HorizontalOptions="Center"/>
-                        <Label Text="Nenhum card ainda" FontSize="15"
-                               TextColor="#4A5568" HorizontalOptions="Center"/>
-                        <Label Text="Toque em '+ Novo Card' para começar."
-                               FontSize="13" TextColor="#2D3748"
+                        <Label Text="Nenhum card ainda"
+                               FontSize="17" FontAttributes="Bold"
+                               TextColor="#57534E"
+                               HorizontalOptions="Center"/>
+                        <Label Text="Crie o primeiro com '+ Novo Card'"
+                               FontSize="13" TextColor="#44403C"
                                HorizontalOptions="Center"/>
                     </VerticalStackLayout>
                 </CollectionView.EmptyView>
 
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
-                        <SwipeView Margin="0,0,0,10">
+                        <SwipeView Margin="0,0,0,8">
 
-                            <!-- ← Deslizar para esquerda: Deletar -->
+                            <SwipeView.LeftItems>
+                                <SwipeItems Mode="Execute">
+                                    <SwipeItem Text="Editar"
+                                               BackgroundColor="#1E3A5F"
+                                               Invoked="OnEditSwipeInvoked"/>
+                                </SwipeItems>
+                            </SwipeView.LeftItems>
+
                             <SwipeView.RightItems>
                                 <SwipeItems Mode="Execute">
                                     <SwipeItem Text="Deletar"
@@ -136,52 +210,44 @@
                                 </SwipeItems>
                             </SwipeView.RightItems>
 
-                            <!-- → Deslizar para direita: Editar -->
-                            <SwipeView.LeftItems>
-                                <SwipeItems Mode="Execute">
-                                    <SwipeItem Text="Editar"
-                                               BackgroundColor="#1E3A5F"
-                                               Invoked="OnEditSwipeInvoked"/>
-                                </SwipeItems>
-                            </SwipeView.LeftItems>
-
-                            <!-- Card visual -->
-                            <Border BackgroundColor="#0F1623"
+                            <Border BackgroundColor="#292524"
                                     StrokeShape="RoundRectangle 16"
-                                    Stroke="#1A2233" StrokeThickness="1"
-                                    Padding="20,16">
-                                <Grid ColumnDefinitions="4,*" ColumnSpacing="14">
+                                    Stroke="#3C3836" StrokeThickness="1"
+                                    Padding="18,16">
+                                <Grid ColumnDefinitions="3,*,Auto" ColumnSpacing="14">
 
-                                    <BoxView Grid.Column="0" BackgroundColor="#00E5A0"
-                                             CornerRadius="2" WidthRequest="4"/>
+                                    <!-- Barra lateral por maturidade -->
+                                    <BoxView Grid.Column="0"
+                                             Color="{Binding MaturidadeCor}"
+                                             CornerRadius="2" WidthRequest="3"/>
 
                                     <VerticalStackLayout Grid.Column="1" Spacing="6">
-
-                                        <!-- Pergunta sempre visível -->
                                         <Label Text="{Binding Pergunta}"
                                                FontSize="15" FontAttributes="Bold"
-                                               TextColor="#E2E8F0"
+                                               TextColor="#E7E5E4"
                                                LineBreakMode="TailTruncation" MaxLines="2"/>
-
-                                        <!-- Resposta OCULTA — exibida como placeholder -->
-                                        <Border BackgroundColor="#1A2233"
-                                                StrokeShape="RoundRectangle 6"
-                                                StrokeThickness="0"
-                                                Padding="8,5">
-                                            <Label Text="••••••••••••"
-                                                   FontSize="12"
-                                                   TextColor="#2D3748"
-                                                   CharacterSpacing="3"/>
-                                        </Border>
-
-                                        <!-- Próxima revisão -->
-                                        <Label Text="{Binding ProximaRevisao, StringFormat='{}{0:dd/MM/yyyy}'}"
-                                               FontSize="11" TextColor="#2D3748"/>
-
+                                        <!-- Resposta oculta -->
+                                        <Label Text="• • • • • • • •"
+                                               FontSize="11" TextColor="#3C3836"
+                                               CharacterSpacing="3"/>
+                                        <Label Text="{Binding ProximaRevisao, StringFormat='{}{0:dd/MM/yy}'}"
+                                               FontSize="11" TextColor="#57534E"/>
                                     </VerticalStackLayout>
+
+                                    <!-- Badge maturidade -->
+                                    <Border Grid.Column="2"
+                                            BackgroundColor="#1C1917"
+                                            StrokeShape="RoundRectangle 8"
+                                            StrokeThickness="0"
+                                            Padding="8,4"
+                                            VerticalOptions="Start">
+                                        <Label Text="{Binding MaturidadeTexto}"
+                                               FontSize="10" FontAttributes="Bold"
+                                               TextColor="{Binding MaturidadeCor}"/>
+                                    </Border>
+
                                 </Grid>
                             </Border>
-
                         </SwipeView>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

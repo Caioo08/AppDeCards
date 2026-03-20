@@ -2,149 +2,214 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SpacedRepetitionApp.Views.StudyPage"
-             Title="Revisão">
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="#1C1917">
 
-    <ContentPage.Background>
-        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-            <GradientStop Color="#0A0A0F" Offset="0.0"/>
-            <GradientStop Color="#0D1117" Offset="1.0"/>
-        </LinearGradientBrush>
-    </ContentPage.Background>
+    <Grid RowDefinitions="Auto,3,*">
 
-    <Grid RowDefinitions="4,*">
+        <!-- ══ HEADER CUSTOMIZADO COM BOTÃO VOLTAR ══════════════════════ -->
+        <Grid Grid.Row="0"
+              Padding="20,52,20,16"
+              ColumnDefinitions="Auto,*,Auto">
+
+            <Border Grid.Column="0"
+                    BackgroundColor="#292524"
+                    StrokeShape="RoundRectangle 12"
+                    Stroke="#44403C" StrokeThickness="1"
+                    Padding="0" VerticalOptions="Center">
+                <Button Text="←"
+                        Clicked="OnVoltarClicked"
+                        BackgroundColor="Transparent"
+                        TextColor="#A8A29E"
+                        FontSize="18"
+                        WidthRequest="44" HeightRequest="40"
+                        BorderWidth="0"/>
+            </Border>
+
+            <VerticalStackLayout Grid.Column="1" Spacing="2"
+                                  HorizontalOptions="Center"
+                                  VerticalOptions="Center">
+                <Label Text="{Binding ModoTexto}"
+                       FontSize="9" FontAttributes="Bold"
+                       TextColor="#78716C" CharacterSpacing="2"
+                       HorizontalOptions="Center"/>
+                <Label Text="{Binding Progresso}"
+                       FontSize="15" FontAttributes="Bold"
+                       TextColor="#F5F5F4"
+                       HorizontalOptions="Center"/>
+            </VerticalStackLayout>
+
+            <!-- Espaço para simetria -->
+            <BoxView Grid.Column="2" WidthRequest="44"/>
+
+        </Grid>
 
         <!-- Barra de progresso -->
-        <ProgressBar Grid.Row="0" Progress="{Binding ProgressoValor}"
-                     ProgressColor="#00E5A0" HeightRequest="4"
-                     Margin="0" VerticalOptions="Start"/>
+        <ProgressBar Grid.Row="1"
+                     Progress="{Binding ProgressoValor}"
+                     ProgressColor="#F59E0B"
+                     HeightRequest="3" Margin="0"
+                     VerticalOptions="Start"/>
 
-        <ScrollView Grid.Row="1">
-            <VerticalStackLayout Padding="24,16,24,40" Spacing="16">
+        <!-- ══ CONTEÚDO ════════════════════════════════════════════════ -->
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Padding="20,16,20,40" Spacing="14">
 
                 <!-- SEM CARDS -->
                 <VerticalStackLayout IsVisible="{Binding SemCards}"
-                                     Spacing="14" Margin="0,80,0,0">
-                    <Label Text="—" FontSize="48" TextColor="#2D3748"
+                                     Spacing="14" Margin="0,60,0,0">
+                    <Label Text="✦" FontSize="44"
+                           TextColor="#44403C"
                            HorizontalOptions="Center"/>
-                    <Label Text="Nenhum card disponível"
+                    <Label Text="Nenhum card para revisar"
                            FontSize="20" FontAttributes="Bold"
-                           TextColor="#E2E8F0" HorizontalOptions="Center"
+                           TextColor="#E7E5E4"
+                           HorizontalOptions="Center"
                            HorizontalTextAlignment="Center"/>
-                    <Button Text="Voltar" Clicked="OnVoltarClicked"
-                            BackgroundColor="#0F1623" TextColor="#E2E8F0"
-                            CornerRadius="14" HeightRequest="50"
-                            BorderColor="#1A2233" BorderWidth="1"
-                            FontAttributes="Bold" Margin="0,12,0,0"/>
+                    <Label Text="Todos os cards estão em dia."
+                           FontSize="14" TextColor="#78716C"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"/>
+                    <Border BackgroundColor="#292524"
+                            StrokeShape="RoundRectangle 14"
+                            Stroke="#44403C" StrokeThickness="1"
+                            Padding="0" Margin="0,8,0,0">
+                        <Button Text="Voltar"
+                                Clicked="OnVoltarClicked"
+                                BackgroundColor="Transparent"
+                                TextColor="#A8A29E"
+                                FontAttributes="Bold" FontSize="15"
+                                HeightRequest="50" BorderWidth="0"/>
+                    </Border>
                 </VerticalStackLayout>
 
                 <!-- EM ANDAMENTO -->
-                <VerticalStackLayout IsVisible="{Binding EmAndamento}" Spacing="16">
-
-                    <!-- Progresso + modo -->
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label Grid.Column="0" Text="{Binding ModoTexto}"
-                               FontSize="11" FontAttributes="Bold"
-                               TextColor="#2D3748" CharacterSpacing="1"
-                               VerticalOptions="Center"/>
-                        <Label Grid.Column="1" Text="{Binding Progresso}"
-                               FontSize="12" FontAttributes="Bold"
-                               TextColor="#00E5A0" VerticalOptions="Center"/>
-                    </Grid>
+                <VerticalStackLayout IsVisible="{Binding EmAndamento}" Spacing="14">
 
                     <!-- Card da PERGUNTA -->
-                    <Border BackgroundColor="#0F1623"
-                            StrokeShape="RoundRectangle 20"
-                            Stroke="#1A2233" StrokeThickness="1"
-                            Padding="28,28" MinimumHeightRequest="180">
-                        <VerticalStackLayout Spacing="14">
-                            <Label Text="PERGUNTA" FontSize="10" FontAttributes="Bold"
-                                   TextColor="#2D3748" CharacterSpacing="2.5"/>
+                    <Border BackgroundColor="#292524"
+                            StrokeShape="RoundRectangle 22"
+                            Stroke="#44403C" StrokeThickness="1"
+                            Padding="24,28"
+                            MinimumHeightRequest="200">
+                        <VerticalStackLayout Spacing="16">
+                            <Label Text="PERGUNTA"
+                                   FontSize="9" FontAttributes="Bold"
+                                   TextColor="#57534E" CharacterSpacing="3"/>
                             <Label Text="{Binding PerguntaAtual}"
                                    FontSize="22" FontAttributes="Bold"
-                                   TextColor="#E2E8F0"
-                                   LineBreakMode="WordWrap" LineHeight="1.4"/>
+                                   TextColor="#F5F5F4"
+                                   LineBreakMode="WordWrap"
+                                   LineHeight="1.45"/>
                         </VerticalStackLayout>
                     </Border>
 
-                    <!-- Card da RESPOSTA (revelada) -->
+                    <!-- Card da RESPOSTA (após revelar) -->
                     <Border IsVisible="{Binding MostrarResposta}"
-                            BackgroundColor="#0A1A12"
-                            StrokeShape="RoundRectangle 20"
-                            Stroke="#153D25" StrokeThickness="1"
-                            Padding="28,24">
+                            BackgroundColor="#1A1208"
+                            StrokeShape="RoundRectangle 22"
+                            Stroke="#78350F" StrokeThickness="1"
+                            Padding="24,22">
                         <VerticalStackLayout Spacing="12">
-                            <Label Text="RESPOSTA" FontSize="10" FontAttributes="Bold"
-                                   TextColor="#00E5A0" CharacterSpacing="2.5"/>
+                            <Label Text="RESPOSTA"
+                                   FontSize="9" FontAttributes="Bold"
+                                   TextColor="#F59E0B" CharacterSpacing="3"/>
                             <Label Text="{Binding RespostaAtual}"
-                                   FontSize="18" TextColor="#86EFAC"
-                                   LineBreakMode="WordWrap" LineHeight="1.4"/>
+                                   FontSize="18"
+                                   TextColor="#FCD34D"
+                                   LineBreakMode="WordWrap"
+                                   LineHeight="1.45"/>
                         </VerticalStackLayout>
                     </Border>
 
                     <!-- Botão REVELAR -->
                     <Border IsVisible="{Binding NaoMostrarResposta}"
-                            BackgroundColor="#00E5A0"
-                            StrokeShape="RoundRectangle 16"
+                            BackgroundColor="#F59E0B"
+                            StrokeShape="RoundRectangle 18"
                             StrokeThickness="0" Padding="0">
                         <Button Text="Revelar Resposta"
                                 Command="{Binding MostrarRespostaCommand}"
-                                BackgroundColor="Transparent" TextColor="#0A0A0F"
+                                BackgroundColor="Transparent"
+                                TextColor="#1C1917"
                                 FontAttributes="Bold" FontSize="16"
                                 HeightRequest="56" BorderWidth="0"/>
                     </Border>
 
                     <!-- Label avaliação -->
-                    <Label Text="COMO FOI?" FontSize="10" FontAttributes="Bold"
-                           TextColor="#2D3748" CharacterSpacing="2"
+                    <Label Text="COMO FOI?"
+                           FontSize="9" FontAttributes="Bold"
+                           TextColor="#57534E" CharacterSpacing="2.5"
                            HorizontalOptions="Center"
-                           IsVisible="{Binding MostrarResposta}"/>
+                           IsVisible="{Binding MostrarResposta}"
+                           Margin="0,2,0,0"/>
 
-                    <!-- BOTÕES 2×2 com preview de intervalo -->
-                    <Grid ColumnDefinitions="*,10,*" RowDefinitions="Auto,10,Auto"
+                    <!-- Botões 2×2 com preview -->
+                    <Grid ColumnDefinitions="*,8,*"
+                          RowDefinitions="Auto,8,Auto"
                           IsVisible="{Binding MostrarResposta}">
 
+                        <!-- Errei -->
                         <Border Grid.Row="0" Grid.Column="0"
-                                BackgroundColor="#1A0A0A" StrokeShape="RoundRectangle 14"
-                                Stroke="#3D1515" StrokeThickness="1" Padding="0">
+                                BackgroundColor="#1F0808"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="#3B0E0E" StrokeThickness="1"
+                                Padding="0">
                             <Button Text="{Binding PreviewErrei}"
-                                    Command="{Binding ResponderCommand}" CommandParameter="0"
-                                    BackgroundColor="Transparent" TextColor="#FC8181"
-                                    FontAttributes="Bold" FontSize="13"
+                                    Command="{Binding ResponderCommand}"
+                                    CommandParameter="0"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#FCA5A5"
+                                    FontAttributes="Bold" FontSize="12"
                                     LineBreakMode="WordWrap"
-                                    HeightRequest="60" BorderWidth="0"/>
+                                    HeightRequest="64" BorderWidth="0"/>
                         </Border>
 
+                        <!-- Difícil -->
                         <Border Grid.Row="0" Grid.Column="2"
-                                BackgroundColor="#1A1100" StrokeShape="RoundRectangle 14"
-                                Stroke="#3D2D00" StrokeThickness="1" Padding="0">
+                                BackgroundColor="#1F1208"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="#3B2008" StrokeThickness="1"
+                                Padding="0">
                             <Button Text="{Binding PreviewDificil}"
-                                    Command="{Binding ResponderCommand}" CommandParameter="3"
-                                    BackgroundColor="Transparent" TextColor="#F6AD55"
-                                    FontAttributes="Bold" FontSize="13"
+                                    Command="{Binding ResponderCommand}"
+                                    CommandParameter="3"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#FCD34D"
+                                    FontAttributes="Bold" FontSize="12"
                                     LineBreakMode="WordWrap"
-                                    HeightRequest="60" BorderWidth="0"/>
+                                    HeightRequest="64" BorderWidth="0"/>
                         </Border>
 
+                        <!-- Médio -->
                         <Border Grid.Row="2" Grid.Column="0"
-                                BackgroundColor="#0A0F1A" StrokeShape="RoundRectangle 14"
-                                Stroke="#152040" StrokeThickness="1" Padding="0">
+                                BackgroundColor="#080E1F"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="#0E1A3B" StrokeThickness="1"
+                                Padding="0">
                             <Button Text="{Binding PreviewMedio}"
-                                    Command="{Binding ResponderCommand}" CommandParameter="4"
-                                    BackgroundColor="Transparent" TextColor="#63B3ED"
-                                    FontAttributes="Bold" FontSize="13"
+                                    Command="{Binding ResponderCommand}"
+                                    CommandParameter="4"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#93C5FD"
+                                    FontAttributes="Bold" FontSize="12"
                                     LineBreakMode="WordWrap"
-                                    HeightRequest="60" BorderWidth="0"/>
+                                    HeightRequest="64" BorderWidth="0"/>
                         </Border>
 
+                        <!-- Fácil -->
                         <Border Grid.Row="2" Grid.Column="2"
-                                BackgroundColor="#0A1A12" StrokeShape="RoundRectangle 14"
-                                Stroke="#153D25" StrokeThickness="1" Padding="0">
+                                BackgroundColor="#081F10"
+                                StrokeShape="RoundRectangle 16"
+                                Stroke="#0E3B1A" StrokeThickness="1"
+                                Padding="0">
                             <Button Text="{Binding PreviewFacil}"
-                                    Command="{Binding ResponderCommand}" CommandParameter="5"
-                                    BackgroundColor="Transparent" TextColor="#68D391"
-                                    FontAttributes="Bold" FontSize="13"
+                                    Command="{Binding ResponderCommand}"
+                                    CommandParameter="5"
+                                    BackgroundColor="Transparent"
+                                    TextColor="#86EFAC"
+                                    FontAttributes="Bold" FontSize="12"
                                     LineBreakMode="WordWrap"
-                                    HeightRequest="60" BorderWidth="0"/>
+                                    HeightRequest="64" BorderWidth="0"/>
                         </Border>
 
                     </Grid>
@@ -153,61 +218,98 @@
 
                 <!-- SESSÃO CONCLUÍDA -->
                 <VerticalStackLayout IsVisible="{Binding SessaoConcluida}"
-                                     Spacing="16" Margin="0,24,0,0">
+                                     Spacing="16" Margin="0,20,0,0">
 
-                    <Label Text="🎉" FontSize="64" HorizontalOptions="Center"/>
+                    <Label Text="✦" FontSize="52"
+                           TextColor="#F59E0B"
+                           HorizontalOptions="Center"/>
 
-                    <Label Text="Sessão concluída!"
-                           FontSize="28" FontAttributes="Bold" TextColor="#E2E8F0"
-                           HorizontalOptions="Center" HorizontalTextAlignment="Center"/>
+                    <Label Text="Sessão concluída"
+                           FontSize="26" FontAttributes="Bold"
+                           TextColor="#F5F5F4"
+                           HorizontalOptions="Center"/>
 
-                    <!-- Resultado -->
-                    <Grid ColumnDefinitions="*,10,*" Margin="0,8,0,0">
-                        <Border Grid.Column="0" BackgroundColor="#0F1623"
-                                StrokeShape="RoundRectangle 16"
-                                Stroke="#1A2233" StrokeThickness="1" Padding="18,16">
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+                    <!-- 3 métricas -->
+                    <Grid ColumnDefinitions="*,6,*,6,*" Margin="0,8,0,0">
+
+                        <Border Grid.Column="0"
+                                BackgroundColor="#292524"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="#44403C" StrokeThickness="1"
+                                Padding="10,14">
+                            <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
                                 <Label Text="{Binding TotalSessao}"
-                                       FontSize="32" FontAttributes="Bold"
-                                       TextColor="#E2E8F0" HorizontalOptions="Center"/>
-                                <Label Text="revisados" FontSize="12"
-                                       TextColor="#4A5568" HorizontalOptions="Center"/>
+                                       FontSize="26" FontAttributes="Bold"
+                                       TextColor="#F5F5F4"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="cards"
+                                       FontSize="11" TextColor="#78716C"
+                                       HorizontalOptions="Center"/>
                             </VerticalStackLayout>
                         </Border>
-                        <Border Grid.Column="2" BackgroundColor="#0A1A12"
-                                StrokeShape="RoundRectangle 16"
-                                Stroke="#153D25" StrokeThickness="1" Padding="18,16">
-                            <VerticalStackLayout Spacing="4" HorizontalOptions="Center">
+
+                        <Border Grid.Column="2"
+                                BackgroundColor="#1A1208"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="#78350F" StrokeThickness="1"
+                                Padding="10,14">
+                            <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
                                 <Label Text="{Binding TaxaAcertoTexto}"
-                                       FontSize="32" FontAttributes="Bold"
-                                       TextColor="#68D391" HorizontalOptions="Center"/>
-                                <Label Text="de acerto" FontSize="12"
-                                       TextColor="#4A5568" HorizontalOptions="Center"/>
+                                       FontSize="26" FontAttributes="Bold"
+                                       TextColor="#F59E0B"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="acerto"
+                                       FontSize="11" TextColor="#78716C"
+                                       HorizontalOptions="Center"/>
                             </VerticalStackLayout>
                         </Border>
+
+                        <Border Grid.Column="4"
+                                BackgroundColor="#292524"
+                                StrokeShape="RoundRectangle 14"
+                                Stroke="#44403C" StrokeThickness="1"
+                                Padding="10,14">
+                            <VerticalStackLayout Spacing="3" HorizontalOptions="Center">
+                                <Label Text="{Binding AcertosSessao}"
+                                       FontSize="26" FontAttributes="Bold"
+                                       TextColor="#86EFAC"
+                                       HorizontalOptions="Center"/>
+                                <Label Text="acertos"
+                                       FontSize="11" TextColor="#78716C"
+                                       HorizontalOptions="Center"/>
+                            </VerticalStackLayout>
+                        </Border>
+
                     </Grid>
 
-                    <Border BackgroundColor="#00E5A0" StrokeShape="RoundRectangle 16"
-                            StrokeThickness="0" Margin="0,8,0,0" Padding="0">
+                    <Border BackgroundColor="#F59E0B"
+                            StrokeShape="RoundRectangle 18"
+                            StrokeThickness="0"
+                            Margin="0,8,0,0" Padding="0">
                         <Button Text="Estudar de Novo"
                                 Command="{Binding ReiniciarCommand}"
-                                BackgroundColor="Transparent" TextColor="#0A0A0F"
+                                BackgroundColor="Transparent"
+                                TextColor="#1C1917"
                                 FontAttributes="Bold" FontSize="16"
                                 HeightRequest="56" BorderWidth="0"/>
                     </Border>
 
-                    <Border BackgroundColor="#0F1623" StrokeShape="RoundRectangle 16"
-                            Stroke="#1A2233" StrokeThickness="1" Padding="0">
+                    <Border BackgroundColor="#292524"
+                            StrokeShape="RoundRectangle 18"
+                            Stroke="#44403C" StrokeThickness="1"
+                            Padding="0">
                         <Button Text="Voltar para Home"
                                 Clicked="OnVoltarClicked"
-                                BackgroundColor="Transparent" TextColor="#9996A8"
+                                BackgroundColor="Transparent"
+                                TextColor="#78716C"
                                 FontAttributes="Bold" FontSize="15"
-                                HeightRequest="52" BorderWidth="0"/>
+                                HeightRequest="50" BorderWidth="0"/>
                     </Border>
 
                 </VerticalStackLayout>
 
             </VerticalStackLayout>
         </ScrollView>
+
     </Grid>
 </ContentPage>

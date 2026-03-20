@@ -8,6 +8,9 @@ public class EditCardViewModel : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    // Expõe o card após salvar para o evento CardAtualizado da View
+    public Card CardAtual => _card;
+
     private string _pergunta = string.Empty;
     public string Pergunta
     {
@@ -26,8 +29,8 @@ public class EditCardViewModel : INotifyPropertyChanged
 
     public EditCardViewModel(CardService cardService)
     {
-        _cardService   = cardService;
-        SalvarCommand  = new Command(Salvar);
+        _cardService  = cardService;
+        SalvarCommand = new Command(Salvar);
     }
 
     public void CarregarCard(Card card)

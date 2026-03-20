@@ -3,6 +3,10 @@ namespace SpacedRepetitionApp.Views;
 public partial class CreateCardPage : ContentPage
 {
     private readonly CardService _cardService;
+    private bool _salvando = false;
+
+    // Evento disparado após salvar — MainPage assina para adicionar o card na lista
+    public event Action<Card>? CardSalvo;
 
     public CreateCardPage(CardService cardService)
     {
@@ -10,31 +14,55 @@ public partial class CreateCardPage : ContentPage
         _cardService = cardService;
     }
 
+    private async void OnCancelarClicked(object sender, EventArgs e)
+        => await Navigation.PopAsync();
+
     private async void OnSaveClicked(object sender, EventArgs e)
     {
-        if (string.IsNullOrWhiteSpace(PerguntaEntry.Text))
+        if (_salvando) return;
+
+        var pergunta = PerguntaEntry.Text?.Trim();
+        var resposta = RespostaEntry.Text?.Trim();
+
+        if (string.IsNullOrEmpty(pergunta))
         {
             await DisplayAlert("Atenção", "Preencha a pergunta.", "OK");
+            PerguntaEntry.Focus();
             return;
         }
-        if (string.IsNullOrWhiteSpace(RespostaEntry.Text))
+
+        if (string.IsNullOrEmpty(resposta))
         {
             await DisplayAlert("Atenção", "Preencha a resposta.", "OK");
+            RespostaEntry.Focus();
             return;
         }
 
-        _cardService.Add(new Card
+        _salvando = true;
+        try
         {
-            Pergunta       = PerguntaEntry.Text.Trim(),
-            Resposta       = RespostaEntry.Text.Trim(),
-            ProximaRevisao = DateTime.Now,
-            CriadoEm      = DateTime.Now
-        });
+            var card = new Card
+            {
+                Pergunta       = pergunta,
+                Resposta       = resposta,
+                ProximaRevisao = DateTime.Now.Date,
+                CriadoEm      = DateTime.Now,
+            };
 
-        PerguntaEntry.Text = string.Empty;
-        RespostaEntry.Text = string.Empty;
+            _cardService.Add(card);
 
-        await DisplayAlert("✓", "Card criado!", "OK");
-        await Navigation.PopAsync();
+            PerguntaEntry.Text = string.Empty;
+            RespostaEntry.Text = string.Empty;
+
+            // Avisa a MainPage ANTES do PopAsync — ainda estamos nesta página
+            CardSalvo?.Invoke(card);
+
+            await DisplayAlert("✓", "Card criado!", "OK");
+            await Navigation.PopAsync();
+        }
+        finally
+        {
+            _salvando = false;
+        }
     }
 }
